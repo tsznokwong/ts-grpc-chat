@@ -10,14 +10,20 @@ const notifyChat = (message: ChatMessage) => {
   });
 };
 
+const joinMessage = (username: string) => {
+  const message = new ChatMessage();
+  message.setUser("Server");
+  message.setText(`${username} joined`);
+  return message;
+};
+
 const ChatHandler = {
   join: (call: grpc.ServerWritableStream<JoinRequest>) => {
+    users.forEach((user) => {
+      call.write(joinMessage(user.request.getUser()));
+    });
     users.push(call);
-
-    const message = new ChatMessage();
-    message.setUser("Server");
-    message.setText(`${call.request.getUser()} joined`);
-    notifyChat(message);
+    notifyChat(joinMessage(call.request.getUser()));
   },
   send: (
     call: grpc.ServerUnaryCall<ChatMessage>,
