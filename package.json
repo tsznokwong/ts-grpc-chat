@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "setup": "yarn && yarn proto",
     "start-server": "ts-node src/server.ts",
     "start-client": "ts-node src/client.ts",
     "proto": "grpc_tools_node_protoc --plugin=protoc-gen-grpc=./node_modules/.bin/grpc_tools_node_protoc_plugin --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts -I . ./src/proto/service.proto --js_out='import_style=commonjs,binary:.' --grpc_out=. --ts_out='service=grpc-node:.'"
