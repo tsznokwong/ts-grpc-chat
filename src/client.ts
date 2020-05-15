@@ -1,12 +1,31 @@
 import * as grpc from "grpc";
 import { ChatClient } from "./proto/service_grpc_pb";
 import * as readline from "readline";
-import { ChatMessage, JoinRequest } from "./proto/service_pb";
+import { ChatMessage, JoinRequest, LeaveRequest } from "./proto/service_pb";
 
 //Read terminal Lines
 var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
+});
+
+[
+  "SIGHUP",
+  "SIGINT",
+  "SIGQUIT",
+  "SIGILL",
+  "SIGTRAP",
+  "SIGABRT",
+  "SIGBUS",
+  "SIGFPE",
+  "SIGUSR1",
+  "SIGSEGV",
+  "SIGUSR2",
+  "SIGTERM",
+].forEach((sig: NodeJS.Signals) => {
+  process.on(sig, () => {
+    leaveChat();
+  });
 });
 
 const client = new ChatClient(
@@ -15,7 +34,7 @@ const client = new ChatClient(
 );
 var username = "";
 
-function startChat() {
+const startChat = () => {
   const req = new JoinRequest();
   req.setUser(username);
   let channel = client.join(req);
@@ -28,14 +47,20 @@ function startChat() {
     message.setText(text);
     client.send(message, () => {});
   });
-}
+};
 
-function onData(message: ChatMessage) {
+const leaveChat = () => {
+  const req = new LeaveRequest();
+  req.setUser(username);
+  client.leave(req, () => {});
+};
+
+const onData = (message: ChatMessage) => {
   if (message.getUser() == username) {
     return;
   }
   console.log(`${message.getUser()}: ${message.getText()}`);
-}
+};
 
 function main() {
   rl.question("What's your name? ", (answer) => {

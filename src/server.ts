@@ -10,10 +10,24 @@ const notifyChat = (message: ChatMessage) => {
   });
 };
 
+const removeUser = (username: string) => {
+  const index = users.findIndex((user) => user.request.getUser() === username);
+  if (index > -1) {
+    users.splice(index, 1);
+  }
+};
+
 const joinMessage = (username: string) => {
   const message = new ChatMessage();
   message.setUser("Server");
   message.setText(`${username} joined`);
+  return message;
+};
+
+const leaveMessage = (username: string) => {
+  const message = new ChatMessage();
+  message.setUser("Server");
+  message.setText(`${username} left`);
   return message;
 };
 
@@ -30,6 +44,13 @@ const ChatHandler = {
     callback: grpc.ServerUnaryCall<ChatMessage>
   ) => {
     notifyChat(call.request);
+  },
+  leave: (
+    call: grpc.ServerUnaryCall<ChatMessage>,
+    callback: grpc.ServerUnaryCall<ChatMessage>
+  ) => {
+    removeUser(call.request.getUser());
+    notifyChat(leaveMessage(call.request.getUser()));
   },
 };
 

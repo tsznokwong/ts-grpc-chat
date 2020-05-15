@@ -3,8 +3,9 @@ syntax = "proto3";
 package chat;
  
 service Chat {
-  rpc join(JoinRequest) returns (stream ChatMessage){}
-  rpc send(ChatMessage) returns (ChatMessage){}
+  rpc join(JoinRequest) returns (stream ChatMessage) {}
+  rpc send(ChatMessage) returns (ChatMessage) {}
+  rpc leave(LeaveRequest) returns (LeaveResponse) {}
 }
 
 message ChatMessage {
@@ -14,4 +15,12 @@ message ChatMessage {
 
 message JoinRequest {
   string user = 1;
+}
+
+message LeaveRequest {
+  string user = 1;
+}
+
+message LeaveResponse {
+  bool success = 1;
 }
