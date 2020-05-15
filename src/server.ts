@@ -1,8 +1,8 @@
 import * as grpc from "grpc";
 import { ChatService } from "./proto/service_grpc_pb";
-import { ChatMessage } from "./proto/service_pb";
+import { ChatMessage, JoinRequest } from "./proto/service_pb";
 
-var users: grpc.ServerDuplexStream<ChatMessage, ChatMessage>[] = [];
+var users: grpc.ServerWritableStream<JoinRequest>[] = [];
 
 const notifyChat = (message: ChatMessage) => {
   users.forEach((user) => {
@@ -11,11 +11,12 @@ const notifyChat = (message: ChatMessage) => {
 };
 
 const ChatHandler = {
-  join: (call: grpc.ServerDuplexStream<ChatMessage, ChatMessage>) => {
+  join: (call: grpc.ServerWritableStream<JoinRequest>) => {
     users.push(call);
+
     const message = new ChatMessage();
     message.setUser("Server");
-    message.setText("new user joined");
+    message.setText(`${call.request.getUser()} joined`);
     notifyChat(message);
   },
   send: (

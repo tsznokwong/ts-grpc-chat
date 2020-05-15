@@ -1,7 +1,7 @@
 import * as grpc from "grpc";
 import { ChatClient } from "./proto/service_grpc_pb";
 import * as readline from "readline";
-import { ChatMessage } from "./proto/service_pb";
+import { ChatMessage, JoinRequest } from "./proto/service_pb";
 
 //Read terminal Lines
 var rl = readline.createInterface({
@@ -16,7 +16,9 @@ const client = new ChatClient(
 var username = "";
 
 function startChat() {
-  let channel = client.join({ user: username });
+  const req = new JoinRequest();
+  req.setUser(username);
+  let channel = client.join(req);
 
   channel.on("data", onData);
 
